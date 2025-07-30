@@ -2,9 +2,10 @@
 
 set -e
 
-# 1. 并发强制删除所有非系统命名空间
-echo "====== 1. 并发强制删除所有非系统命名空间 ======"
-kubectl get ns --no-headers | awk '{print $1}' | grep -vE '^(kube-system|kube-public|kube-node-lease|default)$' | \
+# 1. 并发强制删除所有非系统/网络命名空间
+echo "====== 1. 并发强制删除所有非系统/网络命名空间 ======"
+kubectl get ns --no-headers | awk '{print $1}' | \
+grep -vE '^(kube-system|kube-public|kube-node-lease|default|calico-system|tigera-operator|kube-flannel|cilium|weave|kube-ovn|istio-system)$' | \
 xargs -r -P 20 -I {} kubectl delete ns {} --grace-period=0 --force &
 
 # 2. 并发强制删除 default 下所有资源类型
